@@ -1,11 +1,13 @@
 # importing requests and json
 import requests
+import logging
 
 
-def getWeather(city):
+def getWeather(city, key):
+    """Gets weather data from OpenWeatherMap"""
     BASE_URL = "https://api.openweathermap.org/data/2.5/weather?"
     CITY = city
-    API_KEY = "fc1796c9e66a98785065c1e8456a131c"
+    API_KEY = key   # saved in owm_api_key.txt "fc1796c9e66a98785065c1e8456a131c"
     UNITS = "metric"
     LANG = "cz"
     URL = BASE_URL + "q=" + CITY + "&appid=" + API_KEY + "&units=" + UNITS + "&lang=" + LANG
@@ -19,12 +21,11 @@ def getWeather(city):
     # HTTP request
     try:
         response = requests.get(URL)
-    except:
-        pass
+    except BaseException as err:
+        logging.error(f"Exception while getting HTTP response: {type(err)} - {err}")
     else:
         if response.status_code == 200:
             data = response.json()
-            # print(data)
             main = data['main']
             wind = data['wind']
             temperature = main['temp']
@@ -34,16 +35,9 @@ def getWeather(city):
             report = data['weather']
             response_ok = True
 
-            # print(f'{CITY:-^30}')
-            # print(f'Teplota: {temperature} °C')
-            # print(f'Vítr: {wind_speed} m/s')
-            # print(f'Vlhkost: {humidity} %')
-            # print(f'Tlak: {pressure} hPa')
-            # print(f'Stav: {report[0]["description"]}')
-
         else:
             # showing the error message
-            print("Error in the HTTP request nr: " + response.status_code)
+            print("Error in the HTTP request nr: " + str(response.status_code))
             # TODO: save to file
 
     return response_ok, temperature, humidity, wind_speed, pressure
