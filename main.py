@@ -1,5 +1,5 @@
 from getWeather import getWeather
-from datamodel import WeatherDbHandle
+import datamodel as dm
 from datetime import datetime
 import time
 import logging
@@ -23,10 +23,10 @@ def load_api_key():
 
 if __name__ == '__main__':
     print_app_name()
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     logging.info("Weather Log started")
     lastMin = -1
-    wthrDB = WeatherDbHandle("weather")
+    dm.init_DB()
     owm_api_key = load_api_key()
 
     while True:
@@ -36,6 +36,6 @@ if __name__ == '__main__':
 
             rsp_ok, tmpr, hum, ws, press = getWeather("Litvínov", owm_api_key)
             if rsp_ok:
-                wthrDB.insertData(tmpr, hum, ws, press, now)
+                dm.insertData(tmpr, hum, ws, press, now)
 
         time.sleep(1)

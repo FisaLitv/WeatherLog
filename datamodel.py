@@ -1,33 +1,36 @@
-import sqlite3 as sl
+from sqlalchemy import (create_engine, Column, Integer,
+                        REAL)
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import logging
 
 
-def initDb(name):
-    con = sl.connect(name + '.db')
-    # TODO save to file
-    with con:
-        con.execute("""
-            CREATE TABLE IF NOT EXISTS DATA (
-                id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                datetime INTEGER,
-                temperature REAL,
-                humidity, INTEGER,
-                wind REAL,
-                pressure INTEGER
-            );
-        """)
-    return con
+engine = create_engine("sqlite:///weather.db", echo=False)
+Session = sessionmaker(bind=engine)
+sesn = Session()
+Base = declarative_base()
 
 
-class WeatherDbHandle:
-    def __init__(self, name):
-        self.con = initDb(name)
+class WeatherDb(Base):
+    __tablename__ = 'DATA'
 
-    def insertData(self, temperature, humidity, wind_speed, pressure, now):
-        ts = int(now.timestamp())
-        sql = 'INSERT INTO DATA (datetime, temperature, humidity, wind, pressure) ' \
-              'values(?, ?, ?, ?, ?)'
-        data = [ts, temperature, humidity, wind_speed, pressure]
-        with self.con:
-            self.con.execute(sql, data)
+    id = Column(Integer, primary_key=True)
+    datetime = Column(Integer)
+    temperature = Column(REAL)
+    humidity = Column(Integer)
+    wind = Column(REAL)
+    pressure = Column(Integer)
+
+
+def init_DB():
+    Base.metadata.create_all(engine)
+
+
+def insertData(temperature, humidity, wind_speed, pressure, now):
+    ts = int(now.timestamp())
+    new_record = WeatherDb(datetime=ts, temperature=temperature, humidity=humidity,
+                           wind=wind_speed, pressure=pressure)
+    sesn.add(new_record)
+    sesn.commit()
 
 

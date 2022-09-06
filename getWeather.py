@@ -1,4 +1,3 @@
-# importing requests and json
 import requests
 import logging
 
@@ -36,8 +35,7 @@ def getWeather(city, key):
             response_ok = True
 
         else:
-            # showing the error message
-            print("Error in the HTTP request nr: " + str(response.status_code))
+            logging.error("Error in the HTTP request nr: " + str(response.status_code))
             # TODO: save to file
 
     return response_ok, temperature, humidity, wind_speed, pressure
