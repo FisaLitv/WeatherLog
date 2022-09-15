@@ -1,8 +1,7 @@
-from getWeather import getWeather
 from datamodel import WeatherDbHandle
-from datetime import datetime
-import time
 import logging
+from Graphics.my_app import MyApp
+from PyQt5.QtWidgets import QApplication
 
 
 def print_app_name():
@@ -14,28 +13,18 @@ def print_app_name():
     """)
 
 
-def load_api_key():
-    """Loads api key for OpenWeatherMap from file owm_api_key.txt"""
-    with open("owm_api_key.txt") as file:
-        api_key = file.read()
-    return api_key
-
-
 if __name__ == '__main__':
     print_app_name()
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     logging.info("Weather Log started")
-    lastMin = -1
     wthrDB = WeatherDbHandle("weather")
-    owm_api_key = load_api_key()
 
-    while True:
-        now = datetime.now()
-        if lastMin != now.minute:
-            lastMin = now.minute
+    app = QApplication([])
+    my_app = MyApp(wthrDB)
+    my_app.show()
 
-            rsp_ok, tmpr, hum, ws, press = getWeather("Litvínov", owm_api_key)
-            if rsp_ok:
-                wthrDB.insertData(tmpr, hum, ws, press, now)
+    try:
+        app.exec()
+    except SystemExit:
+        logging.info("Closing app window")
 
-        time.sleep(1)
