@@ -8,14 +8,13 @@ class GetWeather:
     def __init__(self):
         """Loads api key for OpenWeatherMap from file owm_api_key.txt"""
         self.api_key = ""
-        self.city = "Litvínov"
         with open("owm_api_key.txt") as file:
             self.api_key = file.read()
 
-    def getWeather(self, time):
+    def getWeather(self, time, city):
         """Gets weather data from OpenWeatherMap"""
         BASE_URL = "https://api.openweathermap.org/data/2.5/weather?"
-        CITY = self.city
+        CITY = city
         API_KEY = self.api_key  # saved in owm_api_key.txt "fc1796c9e66a98785065c1e8456a131c"
         UNITS = "metric"
         LANG = "cz"
@@ -52,10 +51,10 @@ class GetWeather:
 
         return response_ok, temperature, humidity, wind_speed, pressure
 
-    def get_weather(self, data_model):
+    def get_weather(self, data_model, city):
         logging.info("get_weather called")
         now = datetime.now()
-        rsp_ok, tmpr, hum, ws, press = self.getWeather(now)
+        rsp_ok, tmpr, hum, ws, press = self.getWeather(now, city)
         if rsp_ok:
             data_model.insertData(tmpr, hum, ws, press, now)
-        return tmpr, hum, ws, press
+        return now, tmpr, hum, ws, press

@@ -20,8 +20,9 @@ if __name__ == '__main__':
     wthrDB = WeatherDbHandle("weather")
 
     app = QApplication([])
+    app.setStyle('Fusion')
     my_app = MyApp(wthrDB)
-    my_app.show()
+    my_app.central_widget.show()
 
     try:
         app.exec()
