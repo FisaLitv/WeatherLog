@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QVBoxLayout, \
-    QTextEdit, QPushButton, QLabel
+    QTextEdit, QPushButton, QLabel, QGroupBox, QRadioButton
 from PyQt5.QtCore import QTimer, QRect
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
@@ -14,18 +14,15 @@ class MyApp(object):
         self.city = "Litvínov"
         self.window_width = 1200
         self.window_height = 800
-        #self.setMinimumSize(self.window_width, self.window_height)
+        # self.setMinimumSize(self.window_width, self.window_height)
         self.killThread = False
 
         self.timer = QTimer()
         self.timer.timeout.connect(lambda: self.call_get_weather(data_model, self.city))
         self.timer.start(10000)
 
-
         def button_clicked1():
-            self.text_edit.append("------------------------")
-            # for item in data_model.load_data():
-                # self.text_edit.append("{} - {}".format(item.datetime, item.price))
+            self.call_get_weather(data_model, self.city)
 
 # Set layout
         self.central_widget = QWidget()
@@ -33,29 +30,30 @@ class MyApp(object):
         self.central_widget.setGeometry(100, 100, self.window_width, self.window_height)
         self.central_widget.setWindowTitle('Weather log')
 
-        self.main_vertical_layout = QVBoxLayout(self.central_widget)
-        self.main_vertical_layout.setContentsMargins(15, 15, 15, 15)
-        self.main_vertical_layout.setStretch(0, 0)
-        self.main_vertical_layout.setStretch(1, 1)
+        main_vertical_layout = QVBoxLayout(self.central_widget)
+        main_vertical_layout.setContentsMargins(15, 15, 15, 15)
+        main_vertical_layout.setStretch(0, 0)
+        main_vertical_layout.setStretch(1, 1)
 
-        self.horizontal_Layout = QHBoxLayout()
-        self.horizontal_Layout.setSpacing(15)
-        # self.horizontal_Layout.set
+        horizontal_layout = QHBoxLayout()
+        horizontal_layout.setSpacing(15)
 
-        self.info_grid_layout = QGridLayout()
-        self.info_grid_layout.setColumnMinimumWidth(0, 120)
-        self.info_grid_layout.setColumnMinimumWidth(1, 120)
-        # self.info_grid_layout.setContentsMargins(15, 15, 15, 15)
+        info_grid_layout = QGridLayout()
+        info_grid_layout.setColumnMinimumWidth(0, 120)
+        info_grid_layout.setColumnMinimumWidth(1, 120)
 
-        self.setup_grid_layout = QGridLayout()
+        setup_grid_layout = QGridLayout()
+        timing_layout = QHBoxLayout()
+        timing_group = QGroupBox("Časování")
+        timing_group.setLayout(timing_layout)
 
-        self.horizontal_Layout.addLayout(self.info_grid_layout)
-        self.horizontal_Layout.addLayout(self.setup_grid_layout)
-        self.horizontal_Layout.addStretch()
+        horizontal_layout.addLayout(info_grid_layout)
+        horizontal_layout.addLayout(setup_grid_layout)
+        horizontal_layout.addStretch()
 
-        self.main_vertical_layout.addLayout(self.horizontal_Layout)
+        main_vertical_layout.addLayout(horizontal_layout)
 
-        self.central_widget.setLayout(self.main_vertical_layout)
+        self.central_widget.setLayout(main_vertical_layout)
 
 # Create widgets
         self.info_label = QLabel(f"Počasí v {self.city}")
@@ -67,23 +65,34 @@ class MyApp(object):
         self.label_hum = QLabel("Vlhkost: -- %")
         self.label_press = QLabel("Tlak: -- hPa")
 
-        self.button1 = QPushButton("Aktualizovat")
-        self.button1.resize(64, 32)
-        self.button1.clicked.connect(button_clicked1)
+        ten_sec_radio_button = QRadioButton("10 sekund")
+        ten_sec_radio_button.setChecked(True)
+        ten_sec_radio_button.toggled.connect(lambda: self.timing_change(ten_sec_radio_button))
+        one_min_radio_button = QRadioButton("1 minuta")
+        one_min_radio_button.toggled.connect(lambda: self.timing_change(one_min_radio_button))
+        ten_min_radio_button = QRadioButton("10 minut")
+        ten_min_radio_button.toggled.connect(lambda: self.timing_change(ten_min_radio_button))
+        update_button = QPushButton("Aktualizovat")
+        update_button.resize(64, 32)
+        update_button.clicked.connect(button_clicked1)
+        timing_layout.addWidget(ten_sec_radio_button)
+        timing_layout.addWidget(one_min_radio_button)
+        timing_layout.addWidget(ten_min_radio_button)
 
         self.text_edit = self.create_and_init_text_edit()
 
 
 # Insert widgets to layout
-        self.info_grid_layout.addWidget(self.info_label, 0, 0, 1, 1)
-        self.info_grid_layout.addWidget(self.label_time, 1, 0, 1, 2)
-        self.info_grid_layout.addWidget(self.label_temp, 2, 0, 1, 1)
-        self.info_grid_layout.addWidget(self.label_wind, 2, 1, 1, 1)
-        self.info_grid_layout.addWidget(self.label_press, 3, 0, 1, 1)
-        self.info_grid_layout.addWidget(self.label_hum, 3, 1, 1, 1)
-        self.setup_grid_layout.addWidget(self.button1, 2, 0, 1, 1)
+        info_grid_layout.addWidget(self.info_label, 0, 0, 1, 1)
+        info_grid_layout.addWidget(self.label_time, 1, 0, 1, 2)
+        info_grid_layout.addWidget(self.label_temp, 2, 0, 1, 1)
+        info_grid_layout.addWidget(self.label_wind, 2, 1, 1, 1)
+        info_grid_layout.addWidget(self.label_press, 3, 0, 1, 1)
+        info_grid_layout.addWidget(self.label_hum, 3, 1, 1, 1)
+        setup_grid_layout.addWidget(timing_group, 1, 0, 1, 1)
+        setup_grid_layout.addWidget(update_button, 2, 0, 1, 1)
 
-        self.main_vertical_layout.addWidget(self.text_edit)
+        main_vertical_layout.addWidget(self.text_edit)
 
 
     @staticmethod
@@ -94,6 +103,17 @@ class MyApp(object):
         # text_edit.setMaximumHeight(500)
         # text_edit.setMaximumWidth(400)
         return text_edit
+
+    def timing_change(self, radio_button):
+        if radio_button.text() == "10 sekund":
+            if radio_button.isChecked():
+                self.text_edit.append("radio_button 10 sec")
+        if radio_button.text() == "1 minuta":
+            if radio_button.isChecked():
+                self.text_edit.append("radio_button 1 min")
+        if radio_button.text() == "10 minut":
+            if radio_button.isChecked():
+                self.text_edit.append("radio_button 10 min")
 
     def call_get_weather(self, data_model, city):
         time, tmpr, hum, ws, press = self.get_weather.get_weather(data_model, city)
