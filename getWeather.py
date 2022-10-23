@@ -56,5 +56,5 @@ class GetWeather:
         now = datetime.now()
         rsp_ok, tmpr, hum, ws, press = self.getWeather(now, city)
         if rsp_ok:
-            data_model.insertData(tmpr, hum, ws, press, now)
+            data_model.insert_data(tmpr, hum, ws, press, now)
         return now, tmpr, hum, ws, press

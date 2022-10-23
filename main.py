@@ -1,4 +1,4 @@
-from datamodel import WeatherDbHandle
+import datamodel as dm
 import logging
 from Graphics.my_app import MyApp
 from PyQt5.QtWidgets import QApplication
@@ -17,11 +17,11 @@ if __name__ == '__main__':
     print_app_name()
     logging.basicConfig(level=logging.INFO)
     logging.info("Weather Log started")
-    wthrDB = WeatherDbHandle("weather")
+    dm.init_DB()
 
     app = QApplication([])
     app.setStyle('Fusion')
-    my_app = MyApp(wthrDB)
+    my_app = MyApp(dm)
     my_app.central_widget.show()
 
     try:
